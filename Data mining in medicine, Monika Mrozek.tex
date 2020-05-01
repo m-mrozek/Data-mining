@@ -1,0 +1,363 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{graphics}
+\usepackage{amsmath}
+\lstset{
+   showstringspaces=false
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=false,
+  breaklines=true,
+}
+
+
+\usetheme{Warsaw}
+
+\begin{document}
+\title{Optimization in object classification}
+\subtitle{The multisurface method}
+\author{Monika Mrozek} 
+\date{11 December 2019} 
+
+\frame{\titlepage} 
+
+
+\section{Introduction}
+
+\subsection{Xcyt: the system for remote cytological diagnosis}
+\begin{frame}{Xcyt}{Basic assumptions and functions}
+The main aim of the software named \textbf{Xcyt} was expanding the possibilities of the prognosis and diagnosis of breast cancer. The system was invented at the University of Wisconsin in Madison\cite{s}. It combines many techniques: digital image analysis, inductive machine learning, mathematical programming and statistics.
+
+\begin{block}{Assumptions and functions}
+\begin{itemize}
+   \item analysis of cytological features,
+   \item diagnosis and attempt to estimate the probability of malignancy,
+   \item when the sample is cancerous, prediction of recurrence.
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{Xcyt}{Cellular features}
+\textbf{Xcyt} makes possible to analyse the exact boundaries of the nuclei. It uses curve-fitting program 
+and examines a lot of parameters:
+\begin{block}
+
+\begin{itemize}
+   \item area,% -- jest to liczba pikseli z których składa się obraz jądra powiększona o $\frac{1}{2}$ liczby pikseli składających się na jego otoczkę,
+   \item radius,
+   \item perimeter,
+   \item symmetry,
+   \item number and size of concavities,
+   \item fractal dimension,
+   \item compactness,
+   \item smoothness.
+   
+\end{itemize}
+\end{block}
+
+
+\end{frame}
+
+
+
+\section{Multisurface Method-Tree (MSM-T)}
+\subsection{Principal assumptions}
+\begin{frame}[allowframebreaks]{Multisurface Method-Tree}{Building of a model}
+
+Xcyt is closely connected with \textbf{MSM-Tree} (\textit{Multisurface Method-Tree}). Its main idea is separation of the points from matrices \textbf{A} and~\textbf{B}. In these circumstances
+
+\begin{itemize}
+\item \textbf{A$_{m \times n}$} is a matrix containing $m$ vectors $x \in \mathbb{R}^n$ with data about patients who were diagnosed with malignant tumour,
+\item \textbf{B$_{k \times n}$} is a matrix containing $k$ vectors $x \in \mathbb{R}^n$ with data about patients who were diagnosed with benign tumour.
+\end{itemize}
+
+
+
+The separating plane is represented by \cite{bcd}
+\begin{align*}
+\gamma=x^T \cdot w \in \mathbb{R}^n
+\end{align*}
+if and only with \\
+$A w \geq e \gamma + e$ \\
+$B w \leq e \gamma - e$\\
+where 
+\begin{itemize}
+\item $w$ - normal to separating plane, $w \in \mathbb{R}^n$
+\item e - vector of ones of appropiate dimension.
+\end{itemize}
+
+
+
+\end{frame}
+
+
+
+\begin{frame}{Multisufrace Method-Tree}{Realtionship with linear programming}
+The problem of separating group of points by piecewise-linear surface is equivalent to solving a linear program
+\begin{align*}
+\displaystyle \min_{w,\gamma,y,z}\frac{e^Ty}{m}+\frac{e^Tz}{k}
+\end{align*}
+subject to
+\begin{itemize}
+\item $A w \geq e \gamma + e$ 
+\item $B w \leq e \gamma - e$
+\item $y,z \geq 0$
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\subsection{Visualisation of MSM-T}
+\begin{frame}
+\begin{figure}[h]
+	\caption{\textit{Olvi L. Mangasarian, W. Nick Street, William H. Wolberg: Breast Cancer Diagnosis via Linear Programming}, Mathematical Programming Technical \cite{bcd} }
+	\centering
+	\includegraphics[scale=0.4]{K}
+	\caption{Separating planes in MSM-T}\label{rys33}
+	
+\end{figure}
+\end{frame}
+
+
+\section{Clinical usage -- diagnosis of breast cancer}
+\subsection{Diagnostic problem}
+%\begin{frame}{Application of MSM-T in breast cancer diagnosis}
+\textbf{MSM} method has a signficant participation in improving breast cancer treatment. The scientists used the diagnosis
+of breast cytology to demonstrate the applicability of this
+method to medical diagnosis and decision making. \\ 
+
+
+\begin{figure}[h]
+
+	\caption{\textit{William H. Wolberg, Olvi L. Mangasarian: Multisurface method of pattern separation for medical diagnosis applied to breast cytology }\cite{msm} }
+	\centering
+	\includegraphics[scale=0.4]{H}
+	\caption{FNA cytology}
+	
+\end{figure}
+
+
+
+
+\subsection{Procedure}
+\begin{frame}[allowframebreaks]{Description of procedure}
+The experiment was conducted at the University of Wisconsin Hospitals. The scientists analised 370 samples. Complete classification was obtained after 4 steps.
+\begin{block}
+
+\begin{itemize}
+\item $(x_1,x_2, \ldots, x_9) \in \mathbb{R}^9$ - the vector of real numbers created for each sample, which contains nine cytological characteristics,
+\item  $(c_{i1},c_{i2}, \ldots, c_{i9}) \in \mathbb{R}^9$ -the normal to the plane, $i=1,2,3,4$
+\item $a_i,b_i$- the distance from the origin to the planes  $\in \mathbb{R}^9$
+\end{itemize}
+
+\end{block}
+Correct separation was accomplished in 369 of 370 samples (201 benign
+and 169 malignant).
+\begin{block}{Interpretation of results}
+
+For $i=1,2,3$ we have
+\begin{itemize}
+\item $c_{i1}x_1+c_{i2}x_2+\ldots+c_{i9}x_9>b_i$ -- then  tumour is malignant at stage $i$,
+\item $c_{i1}x_1+c_{i2}x_2+\ldots+c_{i9}x_9<a_1$ -- then  tumour is benign at
+stage $i$.
+\end{itemize}
+
+Additionally
+
+\begin{itemize}
+\item $c_{41}x_1+c_{42}x_2+\ldots+c_{49}x_9\geq(a_4+b_4)/2$ -- then tumour is malignant at stage 4,
+\item $c_{41}x_1+c_{42}x_2+\ldots+c_{49}x_9<(a_4+b_4)/2$ -- then tumour is benign at stage 4.
+\end{itemize}
+
+
+\end{block}
+
+
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+%\section{Informacja dotycząca oprogramowania}
+
+
+%\begin{frame}[fragile,allowframebreaks]{Oprogramowanie}{Dane}
+%W najbardziej popularnych programach statystycznych można znaleźć zbiory danych powstałe dzięki metodzie \textbf{MSM} (MSM-T). 
+
+%\begin{block}{Breast Cancer Wisconsin (Diagnostic) Data Set}
+%Dane zebrane przez dr. Williama H. Wolberga: 
+%\textit{https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/} \\ 
+%\vspace{0.3cm}
+
+%Informacje o danych \\
+%\textit{https://archive.ics.uci.edu/ml/datasets/
+%Breast+Cancer+Wisconsin+(Diagnostic)}
+
+
+%\end{block}
+
+%\begin{block}{RStudio}
+%Dane dot. wyników biopsji dla 699 pacjentów
+%\begin{lstlisting}[language=R]
+%library(MASS)
+%data(biopsy)
+%\end{lstlisting}
+
+%\end{block}
+
+%\begin{block}{MATLAB}
+%Generowanie drzewa decyzyjnego
+%\begin{lstlisting}[language=Matlab]
+%T = msmt_tree(A,B,max_depth,tolerance,
+%certainty_factor,min_points) 
+
+%\end{lstlisting}
+
+
+
+%\end{block}
+
+%\end{frame}
+
+
+
+
+
+\begin{frame}{Example of decision tree}
+
+\begin{figure}[h]
+
+	\caption{\textit{Multisurface Method Tree with MATLAB \url{http://pages.cs.wisc.edu/~olvi/uwmp/msmt.html}}}
+%	\centering
+	\includegraphics[scale=0.4]{T}
+	\caption{Graphical ilustration of the decision tree for Wisconsin Breast Cancer data}
+	
+\end{figure}
+
+
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{frame}
+\frametitle{Bibliography}
+\begin{thebibliography}{9}
+\bibitem{bcd}
+Olvi L. Mangasarian, W. Nick Street, William H. Wolberg: \emph{Breast Cancer Diagnosis via Linear Programming}, Mathematical Programming Technical Report 94-10, Decemeber 19, 1994
+
+\bibitem{s}
+W. N. Street: \emph{Xcyt: A System for Remote Cytological Diagnosis and Prognosis of Breast Cancer},
+Management Sciences Department, University of Iowa, Iowa City, IA USA
+
+\bibitem{msm}
+William H. Wolberg, Olvi L. Mangasarian: \emph{Multisurface method of pattern separation for medical diagnosis applied to breast cytology}, Proc. Natl. Acad. Sci. USA, December 1990 \url{https://pdfs.semanticscholar.org/5053/7a16eb18e2bc4971165258cba7a071f38cb7.pdf}
+
+\end{thebibliography}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
